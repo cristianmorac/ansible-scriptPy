@@ -1,0 +1,29 @@
+- name: Status server
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: copy script status_server
+      copy:
+        src: status.py
+        dest: /home/{{ ansible_user }}
+
+    - name: install pip
+      apt:
+        name: python3-pip
+        state: latest
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: install package psutil
+      pip:
+        name: psutil
+    
+    - name: exceute script python
+      command: python3 /home/{{ ansible_user }}/status.py
+    
+    - name: Obtener el hostname del servidor
+      command: hostname
+      register: hostname_resul
+    
+    - name: copy arch server init
+      command: scp /home/{{ ansible_user }}/{{ hostname_resul.stdout }}_status.txt dev@{{ Server_dest }}:{{ url_server }}

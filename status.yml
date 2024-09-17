@@ -2,6 +2,10 @@
   hosts: webserver
   become: yes
   tasks:
+    - name: Record start time
+      command: date +%s
+      register: start_time
+
     - name: copy script status_server
       copy:
         src: status.py
@@ -27,3 +31,15 @@
     
     - name: copy arch server init
       command: scp /home/{{ ansible_user }}/{{ hostname_resul.stdout }}_status.txt dev@{{ Server_dest }}:{{ url_server }}
+    
+    - name: Record end time
+      command: date +%s
+      register: end_time
+
+    - name: Calculate elapsed time
+      set_fact:
+        elapsed_time: "{{ (end_time.stdout | int) - (start_time.stdout | int) }}"
+
+    - name: Show elapsed time
+      debug:
+        msg: "Playbook execution time: {{ elapsed_time }} seconds"

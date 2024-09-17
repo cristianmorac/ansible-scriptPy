@@ -1,6 +1,7 @@
 import psutil
 import platform
 import datetime
+from ping3 import ping, verbose_ping
 
 def get_system_info():
     """Obtiene información del sistema."""
@@ -34,6 +35,12 @@ def get_system_info():
     uptime_seconds = psutil.boot_time()
     uptime = datetime.datetime.fromtimestamp(uptime_seconds)
     info['System Uptime'] = datetime.datetime.now() - uptime
+
+    response_time = ping("8.8.8.8")
+    if response_time is not None:
+        info['ping'] = f"Reachable, response time: {response_time:.2f} seconds"
+    else:
+        info['ping'] = "Not Reachable"
     
     return info
 
@@ -44,21 +51,13 @@ def save_to_file(info, filename):
         for key, value in info.items():
             f.write(f"{key}: {value}\n")
 
-def print_system_info(info):
-    """Imprime la información del sistema."""
-    print("\nInformación del Sistema:")
-    for key, value in info.items():
-        print(f"{key}: {value}")
-
 def main():
     """Función principal del script."""
     system_info = get_system_info()
-    print_system_info(system_info)
 
     # Guardar la información en un archivo plano
     filename = f"{system_info['Node Name']}_status.txt"
     save_to_file(system_info, filename)
-    print("\nLa información del servidor ha sido guardada en 'server_status.txt'.")
 
 if __name__ == "__main__":
     main()

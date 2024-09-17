@@ -2,6 +2,12 @@
   hosts: webserver
   become: yes
   tasks:
+    
+    - name: Update and Upgrade
+      apt:
+        update_cache: yes
+        upgrade: yes
+    
     - name: Record start time
       command: date +%s
       register: start_time
@@ -18,10 +24,12 @@
         update_cache: yes
         force_apt_get: yes
 
-    - name: install package psutil
+    - name: install package psutil, ping3 
       pip:
-        name: psutil
-    
+        name: "{{item}}"
+        state: present
+      loop: ['psutil', 'ping3']
+     
     - name: exceute script python
       command: python3 /home/{{ ansible_user }}/status.py
     

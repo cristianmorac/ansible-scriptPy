@@ -1,0 +1,6 @@
+[webserver]
+10.160.63.238
+10.160.63.143
+10.160.63.190
+[all:vars]
+ansible_user=admin-server

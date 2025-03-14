@@ -1,0 +1,1 @@
+url_nginx: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu"

@@ -1,0 +1,50 @@
+---
+- name: Install nginx
+  hosts: webserver
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.10
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    # Actualizar e instalar dependencias necesarias
+    - name: Update and upgrade system packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Install required system packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop: ['gnupg2','ca-certificates','curl','ca-certificates',
+        'lsb-release','ubuntu-keyring']
+
+    # Importar la clave de firma de Nginx
+    - name: Import official nginx signing keys
+      ansible.builtin.apt_key:
+        url: https://nginx.org/keys/nginx_signing.key
+        state: present
+        validate_certs: yes
+
+    # Añadir repositorio de Nginx
+    - name: Add Nginx repository
+      ansible.builtin.apt_repository:
+        repo: "{{ url_nginx }} {{ ansible_lsb.codename }} nginx"
+        filename: "nginx"
+        state: present
+
+    # Actualizar apt
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    # Instalar Nginx
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
